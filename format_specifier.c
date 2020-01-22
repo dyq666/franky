@@ -5,6 +5,7 @@
 void integer_in_bases(void);
 void char_in_bases(void);
 void integer_specifiers(void);
+void incorrect_integer_specifiers(void);
 
 int main(void) {
     integer_in_bases();
@@ -12,6 +13,8 @@ int main(void) {
     char_in_bases();
     printf("\n");
     integer_specifiers();
+    printf("\n");
+    incorrect_integer_specifiers();
     printf("\n");
 
     return 0;
@@ -53,11 +56,31 @@ void integer_specifiers(void) {
     long long long_long_integer = 100LL;
     unsigned long long unsigned_long_long_integer = 100ULL;
 
-    printf("`unsigned_integer` is %u\n", unsigned_integer);
-    printf("`short_integer` is %hd\n", short_integer);
-    printf("`unsigned_short_integer` is %hu\n", unsigned_short_integer);
-    printf("`long_integer` is %ld\n", long_integer);
-    printf("`unsigned_long_integer` is %lu\n", unsigned_long_integer);
-    printf("`long_long_integer` is %lld\n", long_long_integer);
-    printf("`unsigned_long_long_integer` is %llu\n", unsigned_long_long_integer);
+    printf("`integer` use %%d (%d)\n"
+           "`unsigned_integer` use %%u (%u)\n"
+           "`short_integer` use %%hd (%hd)\n"
+           "`unsigned_short_integer` use %%hu (%hu)\n"
+           "`long_integer` use %%ld (%ld)\n"
+           "`unsigned_long_integer` use %%lu (%lu)\n"
+           "`long_long_integer` use %%lld (%lld)\n"
+           "`unsigned_long_long_integer` use %%llu (%llu)\n",
+           integer,
+           unsigned_integer,
+           short_integer,
+           unsigned_short_integer,
+           long_integer,
+           unsigned_long_integer,
+           long_long_integer,
+           unsigned_long_long_integer);
+}
+
+void incorrect_integer_specifiers(void) {
+    unsigned int overflow = 2147483648;
+    short small = 200;
+
+    // %d 的最大值等于 int 的最大值 2147483647, 所以不能用 %d 展示 2147483648.
+    printf("When unsigned value > 2147483648, you must use %%u (%u) rather than %%d (%d).\n"
+           "When use short type, you can use %%d (%d) or %%hd (%hd)\n",
+           overflow, overflow,
+           small, small);
 }
