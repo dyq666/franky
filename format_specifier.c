@@ -8,6 +8,7 @@ void float_in_bases(void);
 void integer_specifiers(void);
 void incorrect_integer_specifiers(void);
 void float_specifiers(void);
+void integer_modifiers(void);
 
 int main(void) {
     integer_in_bases();
@@ -23,6 +24,9 @@ int main(void) {
     printf("\n");
 
     float_specifiers();
+    printf("\n");
+
+    integer_modifiers();
     printf("\n");
 
     return 0;
@@ -119,4 +123,29 @@ void float_specifiers(void) {
            float_,
            double_float,
            long_double_float);
+}
+
+void integer_modifiers(void) {
+    int positive = 444, negative = -444;
+
+    // 数字修饰符相当于设置了一个最小的展示宽度, 如果展示的内容本身大于此值, 则修饰符无效.
+    printf("*%d*\n"
+           "*%2d*\n"
+           "*%10d*\n"
+           "*%-10d*\n",
+           positive,
+           positive,
+           positive,
+           positive);
+
+    // 负数任何情况下都有符号.
+    // 正数默认情况无正好, '+' 修饰符下有加好, ' ' 修饰符下有空格.
+    printf("*%d* *%d*\n"
+           "*%+d* *%+d*\n"
+           "*% d* *% d*\n",
+           positive, negative,
+           positive, negative,
+           positive, negative);
+
+    printf("%e", 0.33);
 }
