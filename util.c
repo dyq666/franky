@@ -7,6 +7,7 @@ typedef struct ListNode {
 } ListNode;
 
 void clean_list_node(ListNode * node);
+ListNode * create_list_node(const int array[], const int count);
 int compare_int(const void *a, const void *b);
 void discard_chars(void);
 int get_int(void);
@@ -21,6 +22,27 @@ void clean_list_node(ListNode * node) {
         node = node -> next;
         free(clean);
     }
+}
+
+ListNode * create_list_node(const int array[], const int count) {
+    /* 创建一个链表.
+    !!! 注意此方法使用了 `malloc`.
+    */
+    ListNode *temp;
+
+    ListNode *dummy = malloc(sizeof(ListNode));
+    ListNode *needle = dummy;
+
+    for (int i = 0; i < count; i ++) {
+        temp = malloc(sizeof(ListNode));
+        *temp = (ListNode) {.val = array[i], .next = NULL};
+        needle -> next = temp;
+        needle = needle -> next;
+    }
+
+    temp = dummy -> next;
+    free(dummy);
+    return temp;
 }
 
 int compare_int(const void *a, const void *b) {
