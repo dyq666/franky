@@ -1,9 +1,27 @@
+#include <stdlib.h>
 #include <stdio.h>
 
+typedef struct ListNode {
+    int val;
+    struct ListNode *next;
+} ListNode;
+
+void clean_list_node(ListNode * node);
 int compare_int(const void *a, const void *b);
 void discard_chars(void);
 int get_int(void);
 void print_int_array(const int array[], const int count);
+void print_list_node(const ListNode * node);
+
+void clean_list_node(ListNode * node) {
+    /* 清理动态分配给链表的内存. */
+    ListNode *clean;
+    while (node != NULL) {
+        clean = node;
+        node = node -> next;
+        free(clean);
+    }
+}
 
 int compare_int(const void *a, const void *b) {
     /* 用于 `qsort` 中升序排序 int. (本函数可作为其他类型的参考)
@@ -65,3 +83,18 @@ void print_int_array(const int array[], const int count) {
     }
     puts("\n]");
 }
+
+void print_list_node(const ListNode * node) {
+    /* 打印链表. */
+    int i = 0;
+    while (node != NULL) {
+        if (i != 0) {
+            printf(" -> ");
+        }
+        printf("%d", node -> val);
+
+        node = node -> next;
+        i ++;
+    }
+    putchar('\n');
+};
