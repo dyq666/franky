@@ -28,21 +28,16 @@ ListNode * create_list_node(const int array[], const int count) {
     /* 创建一个链表.
     !!! 注意此方法使用了 `malloc`.
     */
-    ListNode *temp;
-
-    ListNode *dummy = malloc(sizeof(ListNode));
-    ListNode *needle = dummy;
+    ListNode dummy = (ListNode) {.val = -1, .next = NULL};
+    ListNode *needle = &dummy;
 
     for (int i = 0; i < count; i ++) {
-        temp = malloc(sizeof(ListNode));
-        *temp = (ListNode) {.val = array[i], .next = NULL};
-        needle -> next = temp;
+        needle -> next = malloc(sizeof(ListNode));
+        *(needle -> next) = (ListNode) {.val = array[i], .next = NULL};
         needle = needle -> next;
     }
 
-    temp = dummy -> next;
-    free(dummy);
-    return temp;
+    return dummy.next;
 }
 
 int compare_int(const void *a, const void *b) {
