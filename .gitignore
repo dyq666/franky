@@ -13,3 +13,4 @@ venv/
 
 # c
 *.o
+learn.c
