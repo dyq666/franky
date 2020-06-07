@@ -6,7 +6,7 @@
 
 EOF (end of file) 标记了 stream 的终止位置. 
 
-对于终端来说, 类 Unix 系统在一行的开头输入 Ctrl+D 标记终止位置. 此时, C 会返回 EOF.
+对于终端来说, 类 Unix 系统在一行的开头输入 Ctrl+D 来标记终止位置, 此时就可以从 stdin 中读取到 EOF.
 
 ```c
 /* 编号: 1
@@ -14,8 +14,8 @@ EOF (end of file) 标记了 stream 的终止位置.
 #include <stdio.h>
 int main(void) {
     // 这里使用 int 而不是 char 的原因如下:
-    // 1. EOF 的值通常为 -1, 而 char 在规范中没有说明必须是 signed char, 因而也能是 unsigned char, unsigned char 类型没有 -1.
-    // 2. getchar 本身的返回值就是 int. 因而使用 int 是百分百没错的.
+    // 1. EOF 的值通常为 -1, 而 char 在规范中没有说明必须是 signed char, 因而也能是 unsigned char, unsigned char 类型无法表达 -1.
+    // 2. getchar 的返回值就是 int. 因而使用 int 是百分百没错的.
     int ch;
     while ((ch = getchar()) != EOF)
         putchar(ch);
@@ -23,24 +23,24 @@ int main(void) {
 }
 ```
 
-对于文件来说, 有两种常见的方式标记终止位置. 第一种, 在终止位置放置特殊字符 (例如 Ctrl+Z). 第二种, 比较已读取的字节和文件本身的字节. 前者是较老的方法, 后者是当前使用的方式. 无论哪种方式, C 都会在到达终止位置时返回 EOF.
+对于文件来说, 有两种常见的方式标记终止位置. 第一种, 在终止位置放置特殊字符 (例如 Ctrl+Z). 第二种, 比较已读取的字节和文件本身的字节. 前者是较老的方法, 后者是目前操作系统常用的方式. 无论哪种方式, 都可以在 C 中的相关函数中读取到 EOF.
 
 ## 重定向 stdin / stdout
 
-在 **编号 1** 代码中, `getchar` 和 `putchar` 分别使用 stdin 和 stdout, 而 stdin / stdout 默认对应终端输入输出. 而操作系统为我们提供了重定向 stdin / stdout 的方法.
+在 **编号 1 代码** 中, `getchar` 和 `putchar` 分别使用 stdin 和 stdout, 而 stdin / stdout 默认对应终端输入输出. 而操作系统为我们提供了重定向 stdin / stdout 的方法.
 
-假设现在有一个文件 word.txt, **编号 1** 代码编译后的文件叫 out.o. 那么 `./out.o < word.txt` 就会把 stdin 重定向到 word.txt, 最终结果就是终端上显示 word.txt 中的内容.
+假设现在有一个文件 word.txt, **编号 1 代码** 编译后的文件叫 out.o. 那么 `./out.o < word.txt` 就会把 stdin 重定向到 word.txt, 最终结果就是终端上显示 word.txt 中的内容.
 
-而 `./out.o > word.txt` 则会把 stdout 重定向到 word.txt, 最终结果就是终端中输入的内容存到文件中. 注意重定向 stdout 会覆盖文件内容, 这个操作第一步就是清空文件的内容!
+而 `./out.o > word.txt` 则会把 stdout 重定向到 word.txt, 最终结果就是终端中输入的内容存到文件中. 注意重定向 stdout 会覆盖文件内容, 这个操作第一步就是清空 word.txt 的内容!
 
 `./out.o < word.txt > word_copy.txt` 则同时重定向了 stdin 和 stdout. 最终结果是将 word.txt 的内容复制到 word_copy.txt.
 
-另外需要注意, 重定向功能是操作系统提供的功能, 并不是 C 的. 操作系统为可执行文件提供重定向功能, 编译后的 C 语言只是可执行文件的其中一个. 此外, 操作系统还未可执行文件提供 >>, |, 具体功能可参考 Unix 相关的书籍.
+另外需要注意, 重定向功能是操作系统提供的功能, 并不是 C 的. 操作系统为可执行文件提供重定向功能, 编译后的 C 只是可执行文件的其中一个. 此外, 操作系统还为可执行文件提供 >>, | 等功能, 具体可参考 Unix 相关的书籍.
 
 ## buffered input
 
 C 中标准库中的输入都是 buffered, 一个表现是在终端中只有敲 Enter 键时, 相关函数 (例如 getchar) 才会拿到数据.
-例如下面是运行 **编号 1 代码** 的一个例子, 如果不是 buffered, 那么当敲下 A 键时, 就应该立刻显示 A. 如下面 **编号 1 终端交互** 所示. 另一个表现是在敲 Enter 前, 你可以修改已经输入的内容.
+例如下面是运行 **编号 1 代码** 的一个例子, 如果不是 buffered, 那么当敲下第一行 Apple 中的 A 时, 就应该立刻显示 A. 另一个表现是在敲 Enter 前, 你可以修改已经输入的内容.
 
 ```
 /* 编号: 1 */
@@ -70,11 +70,11 @@ Apple!  // 这里敲下了 Enter
 // 这里敲下了 Ctrl+D
 ```
 
-### buffered input 带来的问题
+## 输入输出中常遇的问题
 
-#### 问题 1 Enter 键会输入 '\n' 字符, 有时候这个 '\n' 字符会比较讨厌.
+### 问题 1 Enter 键会输入 '\n' 字符, 有时候这个 '\n' 字符会比较讨厌.
 
-**编号 3 代码** 中希望用户输入 y 代表猜对了, 输入 n 代表猜对了, 继续猜. 但如 **编号 3 终端交互** 所示, 当用户输入 n 时, 循环执行了两次, 因为实际上输入的内容是 `n\n`, 所以 getchar 两次.
+**编号 3 代码** 中希望用户输入 y 代表猜对了, 输入 n 代表猜错了. 但如 **编号 3 终端交互** 所示, 当用户输入 n 时, 循环执行了两次, 因为实际上输入的内容是 `n\n`, 所以循环执行了两次.
 
 ```c
 /* 编号: 3
@@ -139,13 +139,13 @@ yes  // 这里敲下 Enter
 Bye!
 ```
 
-#### 问题 2 scanf 和 getchar 混用.
+### 问题 2 scanf 和 getchar 混用.
 
 由于 scanf 会忽略空白字符 (space / tab / newline), 因而每行输入中后面的空白字符都会留在输入流中. 下面 **编号 5 终端交互** 是 **编号 5 代码** 的一个例子, 其中 32, 9, 10 分别是 space, tab, newline 的 ascii 码.
 
 ```c
 /* 编号: 5
-   功能: 说明混用 scanf 和 getchar 混用的结果 */
+   功能: 说明混用 scanf 和 getchar 的结果 */
 #include <stdio.h>
 int main(void) {
     int ch, row, col;
@@ -168,7 +168,7 @@ row: 2, col: 3
 
 解决办法和 **编号 4 代码** 中一样, 在 scanf 和 getchar 之间使用 `discard_rest_input_line` 清理 scanf 在输入流中遗留下来的字符.
 
-#### 问题 3 多个 scanf.
+### 问题 3 多个 scanf.
 
 scanf 读取失败后, 会把读取的内容放回输入流中. 如 **编号 6 终端交互** 所示, 输入字符 a 没有匹配 scanf 中的 %d, 因而被放回输入流中, 下一次 getchar 就会读取这个字符.
 
@@ -195,4 +195,33 @@ a  // 输入内容
 (97)a(10)
 ```
 
-因而当使用多个 scanf, 尤其是在循环中使用时, 必须清理输入流中的内容.
+因而当使用多个 scanf, 尤其是在循环中使用时, 必须清理输入流中的内容. 如果不清理输入流的内容, 那么就会像 **编号 7 终端交互** 中一样无限循环, 只能用 Ctrl+c 强制终止程序, 原因就是字符 a 不能被 scanf 读取, 被留在输入流中, 然后下一个 scanf 又读取 a, 一直循环.
+
+```c
+/* 编号: 7
+   功能: 使用 scanf 后, 清理输入流. 这里省略了 `discard_rest_input_line` 函数的定义*/
+#include <stdio.h>
+int main(void) {
+    int i = -1;
+    printf("Enter a integer:\n");
+    while (scanf("%d", &i) != 1) {
+        discard_rest_input_line();
+        printf("Enter a integer:\n");
+    }
+    discard_rest_input_line();
+    printf("i = %d\n", i);
+    return 0;
+}
+```
+
+```
+/* 编号: 7
+   说明: 注释掉编号 7 代码中的 `discard_rest_input_line` 后的一个例子 */
+Enter a integer:
+a  // 输入内容
+Enter a integer:
+Enter a integer:
+Enter a integer:
+Enter a integer:
+^C  // 输入 Ctrl+C
+```
