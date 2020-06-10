@@ -102,28 +102,33 @@ y  // 这里敲下 Enter
 Bye!
 ```
 
-一个解决办法是在每次循环中, 只读取每行的第一个字符, 忽略剩下所有的字符, 如 **编号 4 代码** 中 `discard_rest_input_line` 所示, 需要注意的是在 while 循环之后也执行了一次 `discard_rest_input_line`, 原因是输入 y 之后的内容也需要清理, 虽然在本例中没有影响, 但程序如果后面还有处理输入的代码, 就会被这些遗留下来的内容所影响. 如 **编号 4 终端交互** 所示, 现在可以正确的处理输入的 n 了, 不过 no 也被当做了 n, yes 被当做了 y, 原因就是我们的程序只用每行的一个字符, 其他字符都会丢弃.
+解决办法是每次只读取每行的第一个字符, 忽略剩下所有的字符, **编号 4 代码** 中 `get_first` 完成了这个功能. 如 **编号 4 终端交互** 所示, 可以正确的处理 n 了, 不过 no 也被当做了 n, yes 被当做了 y, 但通常来说这样已经足够用了.
 
 ```c
 /* 编号: 4
    功能: 简易的猜数, 用于说明 Enter 键带来的问题 */
 #include <stdio.h>
 void discard_rest_input_line(void);
+int get_first(void);
 int main(void) {
     int guess = 1;
     printf("Enter y if my guess is right, otherwise enter n.\n");
     printf("It is %d?\n", guess);
-    while (getchar() != 'y') {
+    while (get_first() != 'y')
         printf("It is %d?\n", ++guess);
-        discard_rest_input_line();
-    }
-    discard_rest_input_line();
     printf("Bye!\n");
     return 0;
 }
 void discard_rest_input_line(void) {
+    /* 丢弃当前行所有剩余字符 */
     while (getchar() != '\n')
         continue;
+}
+int get_first(void) {
+    /* 返回一行中的第一个字符, 并丢弃剩下所有字符. */
+    int ch = getchar();
+    discard_rest_input_line();
+    return ch;
 }
 ```
 
