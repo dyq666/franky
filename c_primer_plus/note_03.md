@@ -175,3 +175,5 @@ oct: 63
 ## 浮点数
 
 浮点数字面量是 double 类型的, float 被当做参数传入函数时也会转为 double 类型. 因此 printf 中的 %f, 实际上是 double 类型的描述符.
+
+浮点数相关的数据都可以在 `float.h` 中找到, 例如 exponent 的位数, mantissa 的位数
